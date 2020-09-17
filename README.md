@@ -10,7 +10,7 @@ In addition, Determining the confusion matrix for all these and then calculating
 After running all classifiers the best performing classifier for this dataset is KNN with N = 3. It has the ROC curve closer to the left corner and lowest missclassifcation error from all. 
 
 
-<img src="https://github.com/JaimeGoB/Default-Prediction-Using-Binary-Classifiers/blob/master/data/all_roc.png" length = "1200" width="900"/>
+<img src="https://github.com/JaimeGoB/Default-Prediction-Using-Binary-Classifiers/blob/master/data/all_roc.png"/>
 
 <img src="https://github.com/JaimeGoB/Default-Prediction-Using-Binary-Classifiers/blob/master/data/missclassification.png" length = "600" width="400"/>
 

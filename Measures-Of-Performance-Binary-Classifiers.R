@@ -1,9 +1,3 @@
-# Jose Jaime Goicoechea
-# Mini Project 2
-#############################################
-# German Credit 
-# Question 3
-#############################################
 library(pROC)
 library(MASS)
 library(dplyr)

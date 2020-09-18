@@ -5,6 +5,8 @@ Using the following classifers:
 - Logistic Regression
 - Decision Tree
 - KNN
+
+
 In addition, Determining the confusion matrix for all these and then calculating the missclassification rate and also plotting and ROC curve for all classifers to conclude the best classifier for this dataset.
 
 After running all classifiers the best performing classifier for this dataset is KNN with N = 3. It has the ROC curve closer to the left corner and lowest missclassifcation error from all. 

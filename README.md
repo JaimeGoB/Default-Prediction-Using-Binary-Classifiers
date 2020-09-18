@@ -14,10 +14,6 @@ After running all classifiers the best performing classifier for this dataset is
 
 <img src="https://github.com/JaimeGoB/Default-Prediction-Using-Binary-Classifiers/blob/master/data/all_roc.png"/>
 
-<img src="https://github.com/JaimeGoB/Default-Prediction-Using-Binary-Classifiers/blob/master/data/missclassification.png" length = "600" width="400"/>
-
-
-
 
 # Dataset
 

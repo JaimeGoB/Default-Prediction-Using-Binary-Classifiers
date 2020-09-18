@@ -7,6 +7,7 @@ library(rpart)
 library(rpart.plot)
 #KNN
 library(kknn)
+library(class)
 
 
 german_credit = read.csv("~/Documents/UTD/stat-learning-stat4360/Mini-Project-2/Discriminant-Analysis/Data/germancredit.csv")
@@ -46,9 +47,9 @@ TrueNegative <- confusion_matrix_lda[2,2]
 #Measures of performance
 sensitivity_lda <- TruePostive / (TruePostive + FalsePositive)
 specificity_lda <- TrueNegative / (TrueNegative + FalseNegative)
-missclassication_rate_lda <- ((FalsePositive + FalseNegative) 
-                        / (TruePostive + TrueNegative + FalsePositive + FalseNegative))
-missclassication_rate_lda
+missclassification_rate_lda <- ((FalsePositive + FalseNegative) 
+                              / (TruePostive + TrueNegative + FalsePositive + FalseNegative))
+missclassification_rate_lda
 #ROC curve
 roc_curve_lda <- roc(train_Y, lda_pred$posterior[,"1"], levels = c("0", "1"))
 plot(roc_curve_lda, col = 'blue', main = "ROC Curve")
@@ -80,9 +81,9 @@ TrueNegative <- confusion_matrix_qda[2,2]
 #Measures of performance
 sensitivity_qda <- TruePostive / (TruePostive + FalsePositive)
 specificity_qda <- TrueNegative / (TrueNegative + FalseNegative)
-missclassication_rate_qda <- ((FalsePositive + FalseNegative) 
-/ (TruePostive + TrueNegative + FalsePositive + FalseNegative) )
-missclassication_rate_qda
+missclassification_rate_qda <- ((FalsePositive + FalseNegative) 
+                              / (TruePostive + TrueNegative + FalsePositive + FalseNegative) )
+missclassification_rate_qda
 #ROC curve
 roc_curve_qda <- roc(train_Y, qda_pred$posterior[,"1"], levels = c("0", "1"))
 plot(roc_curve_qda, col = 'red', main = "ROC Curve")
@@ -137,12 +138,12 @@ TrueNegative <- confusion_matrix_lgm[2,2]
 #Measures of performance
 sensitivity_lgm <- TruePostive / (TruePostive + FalsePositive)
 specificity_lgm <- TrueNegative / (TrueNegative + FalseNegative)
-missclassication_rate_lgm <- ((FalsePositive + FalseNegative) 
+missclassification_rate_lgm <- ((FalsePositive + FalseNegative) 
                               / (TruePostive + TrueNegative + FalsePositive + FalseNegative) )
-missclassication_rate_lgm
+missclassification_rate_lgm
 
 #ROC curve
-roc_curve_lgm <- roc(Default ~ logistic_regression_pred > 0.5, data = german_credit)
+roc_curve_lgm <- roc(Default ~ logistic_regression_pred, data = german_credit)
 plot(roc_curve_lgm, col = 'green', main = "ROC Curve")
 legend("bottomright",
        legend=c("ROC Curve - LR"),
@@ -153,14 +154,16 @@ legend("bottomright",
 # Decision Tree
 ##############
 #Fitting lg model and its prediction
-decision_tree_fit <- rpart(Default ~ ., data = german_credit)
-decision_tree_pred <- predict(decision_tree_fit, german_credit)
+decision_tree_fit <- rpart(Default ~ ., 
+                           data = german_credit,
+                           method = "class")
+decision_tree_pred <- predict(decision_tree_fit, type = "class")
 
 #visual of decission tree
-rpart.plot(decision_tree_fit, main="Classification Tree German Credit")
+rpart.plot(decision_tree_fit, main="Decision Tree German Credit")
 
 #Setting up confusio matrix
-confusion_matrix_dt <- table(decision_tree_pred > 0.5, train_Y)
+confusion_matrix_dt <- table(decision_tree_pred , train_Y)
 confusion_matrix_dt
 
 #Setting up True positive, false postive ...
@@ -176,12 +179,19 @@ TrueNegative <- confusion_matrix_dt[2,2]
 #Measures of performance
 sensitivity_dt <- TruePostive / (TruePostive + FalsePositive)
 specificity_dt <- TrueNegative / (TrueNegative + FalseNegative)
-missclassication_rate_dt <- ((FalsePositive + FalseNegative) 
-                              / (TruePostive + TrueNegative + FalsePositive + FalseNegative) )
-missclassication_rate_dt
+missclassification_rate_dt <- ((FalsePositive + FalseNegative) 
+                             / (TruePostive + TrueNegative + FalsePositive + FalseNegative) )
+missclassification_rate_dt
+
+
+
+
 
 #ROC curve
-roc_curve_dt <- roc(Default ~ decision_tree_pred, data = german_credit)
+#https://www.youtube.com/watch?v=B0ZuGCibYRw
+#time 9:41
+decision_tree_pred_prob <- predict(decision_tree_fit, type = "prob")
+roc_curve_dt <- roc(train_Y, decision_tree_pred_prob[,1])
 plot(roc_curve_dt, col = 'pink', main = "ROC Curve")
 legend("bottomright",
        legend=c("ROC Curve - DT"),
@@ -191,15 +201,16 @@ legend("bottomright",
 ##############
 # KNN
 ##############
-#knn
-knn_fit <- train.kknn(Default ~ ., german_credit, ks = 3,
-                      kernel = "rectangular", scale = TRUE)
-
+knn_fit <- train.kknn(Default ~ ., 
+                      german_credit, 
+                      ks = 3,
+                      kernel = "rectangular", 
+                      scale = TRUE)
+# knn_pred <- as.numeric(predict(knn_fit, german_credit))
 knn_pred <- predict(knn_fit, german_credit)
 
-
 #Setting up confusio matrix
-confusion_matrix_knn <- table(knn_pred > 0.5, train_Y)
+confusion_matrix_knn <- table(knn_pred, train_Y)
 confusion_matrix_knn
 
 #Setting up True positive, false postive ...
@@ -215,12 +226,13 @@ TrueNegative <- confusion_matrix_knn[2,2]
 #Measures of performance
 sensitivity_knn <- TruePostive / (TruePostive + FalsePositive)
 specificity_knn <- TrueNegative / (TrueNegative + FalseNegative)
-missclassication_rate_knn <- ((FalsePositive + FalseNegative) 
-                             / (TruePostive + TrueNegative + FalsePositive + FalseNegative) )
-missclassication_rate_knn
+missclassification_rate_knn <- ((FalsePositive + FalseNegative) 
+                              / (TruePostive + TrueNegative + FalsePositive + FalseNegative) )
+missclassification_rate_knn
 
 #ROC curve
-roc_curve_knn <- roc(Default ~ knn_pred, data = german_credit)
+knn_pred_prob <- predict(knn_fit, german_credit, type = "prob")
+roc_curve_knn <- roc(train_Y, knn_pred_prob[,1])
 plot(roc_curve_knn, col = 'black', main = "ROC Curve")
 legend("bottomright",
        legend=c("ROC Curve - KNN"),
@@ -228,14 +240,14 @@ legend("bottomright",
        lty=c(1))
 
 #Comparing all classifiers
-plot(roc_curve_qda, col = 'red', main = "ROC Curve Binary Classifcations")
-lines(roc_curve_lda, col = 'blue')
+plot(roc_curve_lda, col = 'blue', main = "ROC Curve Binary Classifcations")
+lines(roc_curve_qda, col = 'red')
 lines(roc_curve_lgm, col = 'green')
 lines(roc_curve_dt, col = 'pink')
 lines(roc_curve_knn, col = 'black')
 legend("bottomright",
-       legend=c("ROC Curve - QDA", "ROC Curve - LDA", "ROC Curve - LG","ROC Curve - DT", "ROC Curve - KNN"),
-       col=c("red", "blue", "green", "pink", "black"),
+       legend=c("Linear Discriminant Analysis", "Quadratic Discriminant Analysis", "Logistic Regression","Decision Tree", "KNN"),
+       col=c("blue", "red", "green", "pink", "black"),
        lty=c(1))
 
 
@@ -243,16 +255,13 @@ legend("bottomright",
 ##############
 # #combing all missclassifcation values
 ##############
-all_missclassification_rates <- cbind(missclassication_rate_lda,
-                                      missclassication_rate_qda,
-                                      missclassication_rate_lgm,
-                                      missclassication_rate_dt,
-                                      missclassication_rate_knn
-                                      )
+all_missclassification_rates <- cbind(missclassification_rate_lda,
+                                      missclassification_rate_qda,
+                                      missclassification_rate_lgm,
+                                      missclassification_rate_dt,
+                                      missclassification_rate_knn)
 
-colnames(all_missclassification_rates) <- c("QDA", "LDA", "LG", "DT", "KNN")
-rownames(all_missclassification_rates) <- c("Missclassication Rate")
+colnames(all_missclassification_rates) <- c("LDA", "QDA", "LG", "DT", "KNN")
+rownames(all_missclassification_rates) <- c("missclassification Rate")
 
 all_missclassification_rates
-
-
